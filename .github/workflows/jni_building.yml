@@ -37,7 +37,6 @@ jobs:
 
       - name: Build helloWorld
         run: |
-          cd helloWorldJNI
           ./autogen.sh
           ./configure --prefix="$PWD/install" --disable-shared --enable-static
           make -j2
