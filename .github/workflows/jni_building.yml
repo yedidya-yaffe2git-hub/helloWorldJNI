@@ -37,7 +37,7 @@ jobs:
 
       - name: Build helloWorld
         run: |
-          cd fplll
+          cd helloWorldJNI
           ./autogen.sh
           ./configure --prefix="$PWD/install" --disable-shared --enable-static
           make -j2
@@ -51,7 +51,7 @@ jobs:
             -IhelloWorldJNI/install/include \
             native.cpp \
             -LhelloWorldJNI/install/lib \
-            -Wl,-Bstatic -lfplll -lgmp -lmpfr \
+            -Wl,-Bstatic -lhelloWorldJNI -lgmp -lmpfr \
             -Wl,-Bdynamic \
             -static-libgcc -static-libstdc++ \
             -o helloWorldJNI.dll
