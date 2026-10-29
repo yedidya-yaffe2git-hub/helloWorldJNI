@@ -4,59 +4,32 @@ name: Building helloWorld JNI DLL
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-    runs-on: windows-2022
-
-    defaults:
-      run:
-        shell: msys2 {0}
+    runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Get source files
+        uses: actions/checkout@v4
 
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: UCRT64
-          update: true
-          install: >-
-            mingw-w64-ucrt-x86_64-gcc
-            mingw-w64-ucrt-x86_64-gmp
-            mingw-w64-ucrt-x86_64-mpfr
-            mingw-w64-ucrt-x86_64-autotools
-            mingw-w64-ucrt-x86_64-libtool
-            mingw-w64-ucrt-x86_64-make
-            mingw-w64-ucrt-x86_64-pkgconf
-
-      - uses: actions/setup-java@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '23'
 
-      - name: Build helloWorld
-        run: |
-          ./autogen.sh
-          ./configure --prefix="$PWD/install" --disable-shared --enable-static
-          make -j2
-          make install
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Build helloWorld DLL
+      - name: Compile DLL
+        shell: cmd
         run: |
-          g++ -shared -O2 \
-            -I"$JAVA_HOME/include" \
-            -I"$JAVA_HOME/include/win32" \
-            -IhelloWorldJNI/install/include \
-            native.cpp \
-            -LhelloWorldJNI/install/lib \
-            -Wl,-Bstatic -lhelloWorldJNI -lgmp -lmpfr \
-            -Wl,-Bdynamic \
-            -static-libgcc -static-libstdc++ \
-            -o helloWorldJNI.dll
+          cl /nologo /LD /EHsc /I"%JAVA_HOME%\include" /I"%JAVA_HOME%\include\win32" native.cpp /link /OUT:helloWorldJNI.dll
 
       - name: Upload DLL
         uses: actions/upload-artifact@v4
         with:
-          name: helloWorld_jni-windows-x64
-          path: helloWorld_jni.dll
+          name: helloWorldJNI-DLL
+          path: helloWorldJNI.dll
