@@ -1,7 +1,7 @@
 //CPP
 
 #include <jni.h>
-#include <iostram>
+#include <iostream>
 #include "native.h"
 
 JNIEXPORT void JNICALL Java_sandBridge_HelloWorldJNI_sayHello(JNIEnv* env, jobject thisObject) {
